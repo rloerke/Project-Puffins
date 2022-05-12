@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <div class="jumbotron p-1 p-md-1 bg-white text-center">
+        <h1 class="display-4 font-italic" id="category_title">Log In</h1>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+          <body class="text-center">
+          <form class="form-signin" method="post">
+            <label for="register_form" class="sr-only">Username</label>
+            <input name="userName" class="form-control" placeholder="Username" id="register_form" required autofocus>
+            <label for="register_form" class="sr-only">Password</label>
+            <input name="password" class="form-control mt-2" placeholder="Password" id="register_form" type="password" required>
+            <a href="/forget">Forgot your password?</a>
+            <button class="btn btn-lg btn-primary btn-block mt-4" type="submit" id="register_button">Submit</button>
+          </form>
+          </body>
+        </div>
+        <div class="col-4"></div>
+    </div>
+{% endblock %}

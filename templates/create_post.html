@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <div class="jumbotron p-1 p-md-1 bg-white text-center">
+        <h1 class="display-4 font-italic" id="category_title">Create Post</h1>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+          <body class="text-center">
+          <form class="form-signin" action="{{ url_for('add_post') }}" method="post">
+            <label for="register_form" class="sr-only">Title</label>
+            <input name="title" class="form-control" placeholder="Title" id="register_form" required autofocus>
+            <label for="register_form" class="sr-only">Category</label>
+            <input name="category" class="form-control mt-2" placeholder="Category" id="register_form" required>
+            <label for="register_form" class="sr-only">Text</label>
+            <textarea name="text" class="form-control mt-2" rows="6" placeholder="Text" id="register_form" required></textarea>
+
+            <button class="btn btn-lg btn-primary btn-block mt-4" type="submit" id="register_button">Submit</button>
+          </form>
+          </body>
+        </div>
+        <div class="col-4"></div>
+    </div>
+{% endblock %}

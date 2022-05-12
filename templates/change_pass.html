@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <div class="jumbotron p-1 p-md-1 bg-white text-center">
+        <h1 class="display-4 font-italic" id="category_title">Change Password</h1>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+          <body class="text-center">
+          <form class="form-signin" action="{{ url_for('new_password') }}" method="post">
+            <label for="register_form" class="sr-only">New Password</label>
+            <input name="nPassword" class="form-control" placeholder="New Password" id="register_form" type="password">
+            <input type = 'hidden' value="{{ username }}" name="username">
+            <button class="btn btn-lg btn-primary btn-block mt-4" type="submit" id="register_button">Submit</button>
+          </form>
+          </body>
+        </div>
+    </div>
+{% endblock %}

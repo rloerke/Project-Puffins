@@ -1,0 +1,31 @@
+/* Bootstrap Override CSS */
+
+/* Style for NavBar */
+#navbar, #navbar_out, #navbar_whole
+                        { background-color: black; color: white; border: 2px solid black;}
+#navbar:hover, #navbar_out:hover
+                        { color: lightgray;}
+#navbar_out             { border-radius: 10px; border: 2px solid darkorange;}
+#navbar_whole           { border-bottom: 2px solid white;}
+
+/* Style for Posts */
+#posts                  { background-color: black; color: white; border-radius: 30px;}
+#title, #username       { background-color: black; color: white; border: none; text-decoration: underline;}
+#title:hover, #username:hover
+                        { color: lightgray;}
+#post_button            { background-color: darkorange; border: none;}
+#post_button:hover      { background-color: orange;}
+
+/* Style for Comments */
+#comments               { background-color: black; color: white; border-radius: 30px;}
+
+/* Style for Signup */
+#register_button        { background-color: darkorange; color: white; border-radius: 12px; border: none;}
+#register_button:hover  { background-color: orange;}
+#register_form          { background-color: lightcyan; color: black;}
+#register_form:focus    { border: 3px solid black;}
+.form-control:focus     { border: none; box-shadow: none;}
+
+/* Style for Rank Button */
+#ranks                   { background-color: darkorange; color: white; text-decoration: none; border-radius: 8px;}
+#ranks:hover             { background-color: orange;}
