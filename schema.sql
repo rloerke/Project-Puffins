@@ -14,9 +14,6 @@ create table posts (
     posterID integer not null, --References users.userID
     text_body text not null,
     'category' text not null,
-    laughScore integer not null, --Reaction (laugh) score
-    sadScore integer not null,
-    angryScore integer not null,
     tooPopular integer not null
 );
 
@@ -45,14 +42,6 @@ drop table if exists blockedUsers;
 create table blockedUsers(
     blockedUsername text not null,
     blockerUsername text not null
-);
-
-drop table if exists reactions;
-create table reactions
-(
-    likingUserID integer not null, -- Refer
-    likedPostID integer not null,
-    tVote integer not null  -- 1 for laugh, 2 for sad, 3 for angry
 );
 
 INSERT INTO users (userName, password, rank, secAns) VALUES ("admin", "pbkdf2:sha256:150000$hixxO9pd$89972db09313f7b66249688cd3c9a8b71457662b8a2303092ebe487d648d5363", 10, 'a');

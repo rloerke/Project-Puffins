@@ -369,42 +369,6 @@ class PuffinsTestCase(unittest.TestCase):
         rv = self.app.get('/blocked', follow_redirects=True)
         assert b'Bob' not in rv.data
 
-    def reactions(self):
-        self.signup('Bob', 'default', 'teacher')
-        self.app.post('/add', data=dict(
-            title='Man Utd',
-            category='Football',
-            text='They beat PSG'
-        ), follow_redirects=True)
-        rv = self.app.post('/react_laugh', data=dict(
-            postID=1
-        ), follow_redirects=True)
-        assert b'react_laugh (1)' in rv.data
-        assert b'react_sad (1)' not in rv.data
-        assert b'react_angry (1)' not in rv.data
-        self.app.post('/add', data=dict(
-            title='Man Utd',
-            category='Football',
-            text='They beat PSG'
-        ), follow_redirects=True)
-        rv2 = self.app.post('/react_laugh', data=dict(
-            postID=1
-        ), follow_redirects=True)
-        assert b'react_laugh (1)' not in rv2.data
-        assert b'react_sad (1)' in rv2.data
-        assert b'react_angry (1)' not in rv2.data
-        self.app.post('/add', data=dict(
-            title='Man Utd',
-            category='Football',
-            text='They beat PSG'
-        ), follow_redirects=True)
-        rv3 = self.app.post('/react_laugh', data=dict(
-            postID=1
-        ), follow_redirects=True)
-        assert b'react_laugh (1)' not in rv3.data
-        assert b'react_sad (1)' not in rv3.data
-        assert b'react_angry (1)' in rv3.data
-
     def test_too_popular(self):
         # Checks if too popular posts are being moved to new section
         self.signup('Bob', 'default', 'default')

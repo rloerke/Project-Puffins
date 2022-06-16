@@ -147,152 +147,6 @@ def downvote():
         return redirect(url_for('show_entries'))
 
 
-@app.route('/react_laugh', methods=['POST'])
-def react_laugh():
-    # Allows user to react to a post
-    user = load_user()
-    db = get_db()
-    posted_id = request.form["postID"]
-    cur = db.execute('SELECT * FROM reactions WHERE likedPostID = ? AND likingUserID = ?',
-                     [posted_id, user['userID']])
-    repeat = cur.fetchone()
-    if (repeat is None) or (user['userName'] == 'admin'):
-        if user is not None:
-            db.execute('INSERT INTO reactions (likingUserID, likedPostID, tVote) VALUES (?, ?, ?)',
-                       [user['userID'], posted_id, 1])
-            db.commit()
-            db.execute("UPDATE posts SET laughScore = (laughScore + 1) WHERE postID = ?",
-                       [posted_id])
-            db.commit()
-            return redirect(url_for('show_entries'))
-        else:
-            return redirect(url_for('login'))
-    elif repeat['tVote'] == 2:
-        db.execute("UPDATE posts SET sadScore = (sadScore - 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE posts SET laughScore = (laughScore + 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE reactions SET tVote = ? WHERE likingUserID = ? AND likedPostID = ?",
-                   [1, user['userID'], posted_id])
-        db.commit()
-        return redirect(url_for('show_entries'))
-
-    elif repeat['tVote'] == 3:
-        db.execute("UPDATE posts SET angryScore = (angryScore - 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE posts SET laughScore = (laughScore + 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE reactions SET tVote = ? WHERE likingUserID = ? AND likedPostID = ?",
-                   [1, user['userID'], posted_id])
-        db.commit()
-        return redirect(url_for('show_entries'))
-
-    else:
-        flash('You have already reacted')
-        return redirect(url_for('show_entries'))
-
-
-@app.route('/react_sad', methods=['POST'])
-def react_sad():
-    # Allows user to react to a post
-    user = load_user()
-    db = get_db()
-    posted_id = request.form["postID"]
-    cur = db.execute('SELECT * FROM reactions WHERE likedPostID = ? AND likingUserID = ?',
-                     [posted_id, user['userID']])
-    repeat = cur.fetchone()
-    if (repeat is None) or (user['userName'] == 'admin'):
-        if user is not None:
-            db.execute('INSERT INTO reactions (likingUserID, likedPostID, tVote) VALUES (?, ?, ?)',
-                       [user['userID'], posted_id, 2])
-            db.commit()
-            db.execute("UPDATE posts SET sadScore = (sadScore + 1) WHERE postID = ?",
-                       [posted_id])
-            db.commit()
-            return redirect(url_for('show_entries'))
-        else:
-            return redirect(url_for('login'))
-
-    elif repeat['tVote'] == 1:
-        db.execute("UPDATE posts SET laughScore = (laughScore - 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE posts SET sadScore = (sadScore + 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE reactions SET tVote = ? WHERE likingUserID = ? AND likedPostID = ?",
-                   [2, user['userID'], posted_id])
-        db.commit()
-        return redirect(url_for('show_entries'))
-
-    elif repeat['tVote'] == 3:
-        db.execute("UPDATE posts SET angryScore = (angryScore - 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE posts SET sadScore = (sadScore + 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE reactions SET tVote = ? WHERE likingUserID = ? AND likedPostID = ?",
-                   [2, user['userID'], posted_id])
-        db.commit()
-        return redirect(url_for('show_entries'))
-    else:
-        flash('You have already reacted')
-        return redirect(url_for('show_entries'))
-
-
-@app.route('/react_angry', methods=['POST'])
-def react_angry():
-    # Allows user to react to a post
-    user = load_user()
-    db = get_db()
-    posted_id = request.form["postID"]
-    cur = db.execute('SELECT * FROM reactions WHERE likedPostID = ? AND likingUserID = ?',
-                     [posted_id, user['userID']])
-    repeat = cur.fetchone()
-    if (repeat is None) or (user['userName'] == 'admin'):
-        if user is not None:
-            db.execute('INSERT INTO reactions (likingUserID, likedPostID, tVote) VALUES (?, ?, ?)',
-                       [user['userID'], posted_id, 3])
-            db.commit()
-            db.execute("UPDATE posts SET angryScore = (angryScore + 1) WHERE postID = ?",
-                       [posted_id])
-            db.commit()
-            return redirect(url_for('show_entries'))
-        else:
-            return redirect(url_for('login'))
-    elif repeat['tVote'] == 1:
-        db.execute("UPDATE posts SET laughScore = (laughScore - 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE posts SET angryScore = (angryScore + 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE reactions SET tVote = ? WHERE likingUserID = ? AND likedPostID = ?",
-                   [3, user['userID'], posted_id])
-        db.commit()
-        return redirect(url_for('show_entries'))
-
-    elif repeat['tVote'] == 2:
-        db.execute("UPDATE posts SET sadScore = (sadScore - 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE posts SET angryScore = (angryScore + 1) WHERE postID = ?",
-                   [posted_id])
-        db.commit()
-        db.execute("UPDATE reactions SET tVote = ? WHERE likingUserID = ? AND likedPostID = ?",
-                   [3, user['userID'], posted_id])
-        db.commit()
-        return redirect(url_for('show_entries'))
-    else:
-        flash('You have already reacted')
-        return redirect(url_for('show_entries'))
-
-
 @app.route('/view', methods=['GET', 'POST'])
 def show_single_post():
     # Displays a single post and its comments
@@ -359,9 +213,9 @@ def add_post():
         user_id = user['userID']
         db = get_db()
         db.execute('INSERT INTO posts '
-                   '(pTitle, category, text_body, posterID, laughScore, sadScore, angryScore, tooPopular) '
-                   'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                   [request.form['title'], request.form['category'], request.form['text'], user_id, 0, 0, 0, 0])
+                   '(pTitle, category, text_body, posterID, tooPopular) '
+                   'VALUES (?, ?, ?, ?, ?)',
+                   [request.form['title'], request.form['category'], request.form['text'], user_id, 0])
         db.commit()
         flash('Your post has been created successfully!')
         return redirect(url_for('show_entries'))

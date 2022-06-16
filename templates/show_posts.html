@@ -88,39 +88,6 @@
                         {% endif %}
                     </div>
 
-                    <div class="col-1 mx-auto">
-                    {% if user %}
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="post_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Reactions
-                        </button>
-
-                        <div class="dropdown-menu">
-                            <form action="{{ url_for('react_laugh') }}" method="post">
-                                <div class="form-group">
-                                    <input type="hidden" value={{ entry.postID }} name="postID">
-                                    <input type="submit" value="Laugh ({{ entry.laughScore }})" class="btn btn-primary m-2 mx-5" id="post_button">
-                                </div>
-                            </form>
-
-                            <form action="{{ url_for('react_sad') }}" method="post">
-                                <div class="form-group">
-                                    <input type="hidden" value={{ entry.postID }} name="postID">
-                                    <input type="submit" value="Sad ({{ entry.sadScore }})" class="btn btn-primary m-2 mx-5" id="post_button">
-                                </div>
-                            </form>
-
-                            <form action="{{ url_for('react_angry') }}" method="post">
-                                <div class="form-group">
-                                    <input type="hidden" value={{ entry.postID }} name="postID">
-                                    <input type="submit" value="Angry ({{ entry.angryScore }})" class="btn btn-primary m-2 mx-5" id="post_button">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    {% endif %}
-                    </div>
-
                     <div class="col-2 mx-auto">
                     {% if user %}
                         <form action="{{ url_for('make_comment') }}" method="get">
