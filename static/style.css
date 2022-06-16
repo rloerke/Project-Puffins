@@ -1,11 +1,12 @@
 /* Bootstrap Override CSS */
 
 /* Style for NavBar */
-#navbar, #navbar_out, #navbar_whole
+#navbar, #navbar_out, #navbar_whole, #navbar_post
                         { background-color: black; color: white; border: 2px solid black;}
-#navbar:hover, #navbar_out:hover
+#navbar:hover, #navbar_out:hover, #navbar_post:hover
                         { color: lightgray;}
-#navbar_out             { border-radius: 10px; border: 2px solid darkorange;}
+#navbar_out, #navbar_post
+                        { border-radius: 10px; border: 2px solid darkorange;}
 #navbar_whole           { border-bottom: 2px solid white;}
 
 /* Style for Posts */
