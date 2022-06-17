@@ -177,8 +177,11 @@ def make_comment():
                       'FROM posts JOIN users ON posts.posterID = users.userID WHERE postID=?', [id_post])
     posts = curr.fetchall()
     com = db.execute('SELECT COUNT(*) FROM comments WHERE linked_post=?', [id_post])
-    num_comments = com.fetchall()[0]
-    return render_template('create_comment.html', post=post, user=load_user(), posts=posts, num_comments=num_comments)
+    num_comments = com.fetchall()[0][0]
+    up = db.execute('SELECT SUM(likes.tVote) FROM likes WHERE likedPostID=?', [id_post])
+    num_votes = up.fetchall()[0][0]
+    return render_template('create_comment.html', post=post, user=load_user(),
+                           posts=posts, num_comments=num_comments, num_votes=num_votes)
 
 
 @app.route('/addcomment', methods=['POST'])

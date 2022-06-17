@@ -66,7 +66,7 @@
                         {% if user %}
                             <form action="{{ url_for('upvote') }}" method="post">
                             <input type="hidden" value={{ entry.postID }} name="postID">
-                            <input type="submit" value="Upvote ({{ entry.vote_total }})" class="btn btn-primary mb-3" id="post_button">
+                            <input type="submit" value="Upvote ({{ num_votes }})" class="btn btn-primary mb-3" id="post_button">
                             </form>
 
                             <form action="{{ url_for('downvote') }}" method="post">
@@ -80,7 +80,7 @@
                     {% if user %}
                         <form action="{{ url_for('make_comment') }}" method="get">
                         <input type="hidden" value={{ entry.postID }} name="postID">
-                        <input type="submit" value="Make Comment ({{ entry.post_count }})" class="btn btn-primary" id="post_button">
+                        <input type="submit" value="Make Comment ({{ num_comments }})" class="btn btn-primary" id="post_button">
                         </form>
                     {% endif %}
                     </div>
