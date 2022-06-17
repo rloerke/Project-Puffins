@@ -153,7 +153,7 @@ def show_single_post():
     id_post = request.args['postID']
     db = get_db()
     cur = db.execute('SELECT pTitle, postID, category, text_body, posterID, userID, userName, rank FROM posts '
-                     'JOIN users ON posts.posterID = users.userID WHERE postID=? AND posts.tooPopular = 0', [id_post])
+                     'JOIN users ON posts.posterID = users.userID WHERE postID=?', [id_post])
     post = cur.fetchall()
     curr = db.execute('SELECT userName, comment_body, userID, authorID, linked_post FROM comments '
                       'JOIN users ON comments.authorID = users.userID WHERE linked_post=?', [id_post])
@@ -380,7 +380,7 @@ def user_posts():
                              'LEFT JOIN comments ON posts.postID = comments.linked_post '
                              'JOIN users ON users.userID = posts.posterID '
                              'LEFT JOIN likes ON likes.likedPostID = posts.postID '
-                             'WHERE posts.tooPopular = 0 AND posterID = ? '
+                             'WHERE posterID = ? '
                              'GROUP BY posts.postID ORDER BY postID DESC', [user_id])
         else:
             cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
@@ -388,7 +388,7 @@ def user_posts():
                              'LEFT JOIN comments ON posts.postID = comments.linked_post '
                              'JOIN users ON users.userID = posts.posterID '
                              'LEFT JOIN likes ON likes.likedPostID = posts.postID '
-                             'WHERE category LIKE ? AND posts.tooPopular = 0 AND posterID = ? '
+                             'WHERE category LIKE ? AND posterID = ? '
                              'GROUP BY posts.postID ORDER BY postID DESC', [filter_it, user_id])
             flash("Filtered Unpopular Opinions based on Desired Category")
         post = cur.fetchall()
@@ -414,7 +414,7 @@ def profile():
                          'LEFT JOIN comments ON posts.postID = comments.linked_post '
                          'JOIN users ON users.userID = posts.posterID '
                          'LEFT JOIN likes ON likes.likedPostID = posts.postID '
-                         'WHERE posts.tooPopular = 0 AND posterID = ? '
+                         'WHERE posterID = ? '
                          'GROUP BY posts.postID ORDER BY postID DESC', [user_id])
     else:
         cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
@@ -422,7 +422,7 @@ def profile():
                          'LEFT JOIN comments ON posts.postID = comments.linked_post '
                          'JOIN users ON users.userID = posts.posterID '
                          'LEFT JOIN likes ON likes.likedPostID = posts.postID '
-                         'WHERE category LIKE ? AND posts.tooPopular = 0 AND posterID = ? '
+                         'WHERE category LIKE ? AND posterID = ? '
                          'GROUP BY posts.postID ORDER BY postID DESC', [filter_it, user_id])
         flash("Filtered Unpopular Opinions based on Desired Category")
     post = cur.fetchall()
