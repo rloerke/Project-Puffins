@@ -385,19 +385,13 @@ def user_posts():
         db = get_db()
         filter_it = request.args.get('filter')
         if filter_it == "" or filter_it is None:
-            cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                             'SUM(likes.tVote) as vote_total FROM posts '
-                             'LEFT JOIN comments ON posts.postID = comments.linked_post '
+            cur = db.execute('SELECT * FROM posts '
                              'JOIN users ON users.userID = posts.posterID '
-                             'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                              'WHERE posterID = ? '
                              'GROUP BY posts.postID ORDER BY postID DESC', [user_id])
         else:
-            cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                             'SUM(likes.tVote) as vote_total FROM posts '
-                             'LEFT JOIN comments ON posts.postID = comments.linked_post '
+            cur = db.execute('SELECT * FROM posts '
                              'JOIN users ON users.userID = posts.posterID '
-                             'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                              'WHERE category LIKE ? AND posterID = ? '
                              'GROUP BY posts.postID ORDER BY postID DESC', [filter_it, user_id])
             flash("Filtered Unpopular Opinions based on Desired Category")
@@ -405,8 +399,20 @@ def user_posts():
         cat = db.execute('SELECT DISTINCT category FROM posts WHERE posterID = ? ORDER BY category ASC', [user_id])
         categories = cat.fetchall()
         ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        return render_template('user_profile.html', post=post, categories=categories,
-                               id=user_id, user=load_user(), ranks=ranks)
+
+        post_ids = []
+        ids = db.execute('SELECT DISTINCT postID FROM posts')
+        for i in ids:
+            post_ids += i
+        num_comments = {}
+        for i in post_ids:
+            num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
+        num_likes = {}
+        for i in post_ids:
+            num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+
+        return render_template('user_profile.html', post=post, categories=categories, id=user_id,
+                               user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
     else:
         flash('Your must be logged in to view your user page!')
         return redirect(url_for('login'))
@@ -419,19 +425,13 @@ def profile():
     filter_it = request.args.get('filter')
     db = get_db()
     if filter_it == "" or filter_it is None:
-        cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                         'SUM(likes.tVote) as vote_total FROM posts '
-                         'LEFT JOIN comments ON posts.postID = comments.linked_post '
+        cur = db.execute('SELECT * FROM posts '
                          'JOIN users ON users.userID = posts.posterID '
-                         'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                          'WHERE posterID = ? '
                          'GROUP BY posts.postID ORDER BY postID DESC', [user_id])
     else:
-        cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                         'SUM(likes.tVote) as vote_total FROM posts '
-                         'LEFT JOIN comments ON posts.postID = comments.linked_post '
+        cur = db.execute('SELECT * FROM posts '
                          'JOIN users ON users.userID = posts.posterID '
-                         'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                          'WHERE category LIKE ? AND posterID = ? '
                          'GROUP BY posts.postID ORDER BY postID DESC', [filter_it, user_id])
         flash("Filtered Unpopular Opinions based on Desired Category")
@@ -439,8 +439,20 @@ def profile():
     curr = db.execute('SELECT DISTINCT category FROM posts WHERE posterID = ? ORDER BY category ASC', [user_id])
     categories = curr.fetchall()
     ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    post_ids = []
+    ids = db.execute('SELECT DISTINCT postID FROM posts')
+    for i in ids:
+        post_ids += i
+    num_comments = {}
+    for i in post_ids:
+        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
+    num_likes = {}
+    for i in post_ids:
+        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+
     return render_template('user_profile.html', post=post, categories=categories,
-                           id=user_id, user=load_user(), ranks=ranks)
+                           id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
 
 
 @app.route('/rank')
@@ -492,22 +504,16 @@ def following():
     filter_it = request.args.get('filter')
     db = get_db()
     if filter_it == "" or filter_it is None:
-        cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                         'SUM(likes.tVote) as vote_total FROM posts '
-                         'LEFT JOIN comments ON posts.postID = comments.linked_post '
+        cur = db.execute('SELECT * FROM posts '
                          'JOIN users ON users.userID = posts.posterID '
-                         'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                          'JOIN followers ON followers.followedUsername = users.userName '
                          'WHERE followingUsername = ? AND '
                          'NOT EXISTS (SELECT blockedUsername FROM blockedUsers '
                          'WHERE blockedUsers.blockedUsername = users.userName) '
                          'GROUP BY posts.postID ORDER BY postID DESC', [user['userName']])
     else:
-        cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                         'SUM(likes.tVote) as vote_total FROM posts '
-                         'LEFT JOIN comments ON posts.postID = comments.linked_post '
+        cur = db.execute('SELECT * FROM posts '
                          'JOIN users ON users.userID = posts.posterID '
-                         'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                          'JOIN followers ON followers.followedUsername = users.userName '
                          'WHERE followingUsername = ? AND category LIKE ? AND '
                          'NOT EXISTS (SELECT blockedUsername FROM blockedUsers '
@@ -518,8 +524,20 @@ def following():
     curr = db.execute('SELECT DISTINCT category FROM posts WHERE posterID = ? ORDER BY category ASC', [user_id])
     categories = curr.fetchall()
     ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    post_ids = []
+    ids = db.execute('SELECT DISTINCT postID FROM posts')
+    for i in ids:
+        post_ids += i
+    num_comments = {}
+    for i in post_ids:
+        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
+    num_likes = {}
+    for i in post_ids:
+        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+
     return render_template('following_view.html', post=post, categories=categories,
-                           id=user_id, user=load_user(), ranks=ranks)
+                           id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
 
 
 @app.route('/popular', methods=['GET'])
@@ -528,21 +546,15 @@ def popular():
     db = get_db()
     filter_it = request.args.get('filter')
     if filter_it == "" or filter_it is None:
-        cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                         'SUM(likes.tVote) as vote_total FROM posts '
-                         'LEFT JOIN comments ON posts.postID = comments.linked_post '
+        cur = db.execute('SELECT * FROM posts '
                          'JOIN users ON users.userID = posts.posterID '
-                         'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                          'WHERE posts.tooPopular = 1 and '
                          'NOT EXISTS (SELECT blockedUsername FROM blockedUsers '
                          'WHERE blockedUsers.blockedUsername = users.userName) '
                          'GROUP BY posts.postID ORDER BY postID DESC')
     else:
-        cur = db.execute('SELECT *, COUNT(comments.linked_post) AS post_count, '
-                         'SUM(likes.tVote) as vote_total FROM posts '
-                         'LEFT JOIN comments ON posts.postID = comments.linked_post '
+        cur = db.execute('SELECT * FROM posts '
                          'JOIN users ON users.userID = posts.posterID '
-                         'LEFT JOIN likes ON likes.likedPostID = posts.postID '
                          'WHERE category LIKE ? AND posts.tooPopular = 1 and '
                          'NOT EXISTS (SELECT blockedUsername FROM blockedUsers '
                          'WHERE blockedUsers.blockedUsername = users.userName) '
@@ -551,7 +563,20 @@ def popular():
     posts = cur.fetchall()
     curr = db.execute('SELECT DISTINCT category FROM posts WHERE posts.tooPopular = 1 ORDER BY category ASC')
     categories = curr.fetchall()
-    return render_template('too_popular.html', posts=posts, categories=categories, user=load_user())
+
+    post_ids = []
+    ids = db.execute('SELECT DISTINCT postID FROM posts')
+    for i in ids:
+        post_ids += i
+    num_comments = {}
+    for i in post_ids:
+        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
+    num_likes = {}
+    for i in post_ids:
+        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+
+    return render_template('too_popular.html', posts=posts, categories=categories,
+                           user=load_user(), num_comments=num_comments, num_likes=num_likes)
 
 
 @app.route('/block', methods=['POST'])
