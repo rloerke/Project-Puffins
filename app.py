@@ -75,19 +75,7 @@ def show_entries():
     curr = db.execute('SELECT DISTINCT category FROM posts WHERE posts.tooPopular = 0 ORDER BY category ASC')
     categories = curr.fetchall()
 
-    post_ids = []
-    ids = db.execute('SELECT DISTINCT postID FROM posts')
-    for i in ids:
-        post_ids += i
-    num_comments = {}
-    for i in post_ids:
-        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
-    num_likes = {}
-    for i in post_ids:
-        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
-    for i in post_ids:
-        if num_likes[i] == None:
-            num_likes[i] = 0
+    num_comments, num_likes = count_values(db)
 
     return render_template('show_posts.html', posts=posts, categories=categories,
                            user=load_user(), num_comments=num_comments, num_likes=num_likes)
@@ -335,7 +323,7 @@ def login():
 
 
 def load_user():
-    # Creates an object containing the users information from the users table based on the userID in the session
+    # Creates an object containing the users' information from the users table based on the userID in the session
     user_id = session.get('userID')
     if user_id is None:
         g.user = None
@@ -381,7 +369,7 @@ def delete_posts():
 
 @app.route('/user_posts', methods=['GET', 'POST'])
 def user_posts():
-    # Displays all the posts made by the logged in user on a new profile page
+    # Displays all the posts made by the logged-in user on a new profile page
     user = load_user()
     if user is not None:
         user_id = user['userID']
@@ -403,19 +391,7 @@ def user_posts():
         categories = cat.fetchall()
         ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-        post_ids = []
-        ids = db.execute('SELECT DISTINCT postID FROM posts')
-        for i in ids:
-            post_ids += i
-        num_comments = {}
-        for i in post_ids:
-            num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
-        num_likes = {}
-        for i in post_ids:
-            num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
-        for i in post_ids:
-            if num_likes[i] == None:
-                num_likes[i] = 0
+        num_comments, num_likes = count_values(db)
 
         return render_template('user_profile.html', post=post, categories=categories, id=user_id,
                                user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
@@ -446,19 +422,7 @@ def profile():
     categories = curr.fetchall()
     ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    post_ids = []
-    ids = db.execute('SELECT DISTINCT postID FROM posts')
-    for i in ids:
-        post_ids += i
-    num_comments = {}
-    for i in post_ids:
-        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
-    num_likes = {}
-    for i in post_ids:
-        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
-    for i in post_ids:
-        if num_likes[i] == None:
-            num_likes[i] = 0
+    num_comments, num_likes = count_values(db)
 
     return render_template('user_profile.html', post=post, categories=categories,
                            id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
@@ -534,19 +498,7 @@ def following():
     categories = curr.fetchall()
     ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    post_ids = []
-    ids = db.execute('SELECT DISTINCT postID FROM posts')
-    for i in ids:
-        post_ids += i
-    num_comments = {}
-    for i in post_ids:
-        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
-    num_likes = {}
-    for i in post_ids:
-        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
-    for i in post_ids:
-        if num_likes[i] == None:
-            num_likes[i] = 0
+    num_comments, num_likes = count_values(db)
 
     return render_template('following_view.html', post=post, categories=categories,
                            id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
@@ -554,7 +506,7 @@ def following():
 
 @app.route('/popular', methods=['GET'])
 def popular():
-    # Shows posts that have gotten too popular for the site
+    # Show posts that have gotten too popular for the site
     db = get_db()
     filter_it = request.args.get('filter')
     if filter_it == "" or filter_it is None:
@@ -576,19 +528,7 @@ def popular():
     curr = db.execute('SELECT DISTINCT category FROM posts WHERE posts.tooPopular = 1 ORDER BY category ASC')
     categories = curr.fetchall()
 
-    post_ids = []
-    ids = db.execute('SELECT DISTINCT postID FROM posts')
-    for i in ids:
-        post_ids += i
-    num_comments = {}
-    for i in post_ids:
-        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
-    num_likes = {}
-    for i in post_ids:
-        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
-    for i in post_ids:
-        if num_likes[i] == None:
-            num_likes[i] = 0
+    num_comments, num_likes = count_values(db)
 
     return render_template('too_popular.html', posts=posts, categories=categories,
                            user=load_user(), num_comments=num_comments, num_likes=num_likes)
@@ -678,7 +618,7 @@ def new_password():
 
 @app.route('/blocked', methods=['GET', 'POST'])
 def blocked():
-    # Displays accounts blocked by the user
+    # Display accounts blocked by the user
     user = load_user()
     user_id = user['userID']
     db = get_db()
@@ -688,3 +628,20 @@ def blocked():
     post = cur.fetchall()
     return render_template('blocked_view.html', post=post,
                            id=user_id, user=load_user())
+
+
+def count_values(db):
+    post_ids = []
+    ids = db.execute('SELECT DISTINCT postID FROM posts')
+    for i in ids:
+        post_ids += i
+    num_comments = {}
+    for i in post_ids:
+        num_comments[i] = db.execute('SELECT COUNT(commentID) FROM comments WHERE linked_post=?', [i]).fetchall()[0][0]
+    num_likes = {}
+    for i in post_ids:
+        num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+    for i in post_ids:
+        if num_likes[i] is None:
+            num_likes[i] = 0
+    return num_comments, num_likes
