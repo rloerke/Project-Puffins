@@ -85,6 +85,9 @@ def show_entries():
     num_likes = {}
     for i in post_ids:
         num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+    for i in post_ids:
+        if num_likes[i] == None:
+            num_likes[i] = 0
 
     return render_template('show_posts.html', posts=posts, categories=categories,
                            user=load_user(), num_comments=num_comments, num_likes=num_likes)
@@ -410,6 +413,9 @@ def user_posts():
         num_likes = {}
         for i in post_ids:
             num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+        for i in post_ids:
+            if num_likes[i] == None:
+                num_likes[i] = 0
 
         return render_template('user_profile.html', post=post, categories=categories, id=user_id,
                                user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
@@ -450,6 +456,9 @@ def profile():
     num_likes = {}
     for i in post_ids:
         num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+    for i in post_ids:
+        if num_likes[i] == None:
+            num_likes[i] = 0
 
     return render_template('user_profile.html', post=post, categories=categories,
                            id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
@@ -535,6 +544,9 @@ def following():
     num_likes = {}
     for i in post_ids:
         num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+    for i in post_ids:
+        if num_likes[i] == None:
+            num_likes[i] = 0
 
     return render_template('following_view.html', post=post, categories=categories,
                            id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
@@ -574,6 +586,9 @@ def popular():
     num_likes = {}
     for i in post_ids:
         num_likes[i] = db.execute('SELECT SUM(tVote) FROM likes WHERE likedPostID=?', [i]).fetchall()[0][0]
+    for i in post_ids:
+        if num_likes[i] == None:
+            num_likes[i] = 0
 
     return render_template('too_popular.html', posts=posts, categories=categories,
                            user=load_user(), num_comments=num_comments, num_likes=num_likes)
