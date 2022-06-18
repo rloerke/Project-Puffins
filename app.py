@@ -373,28 +373,8 @@ def user_posts():
     user = load_user()
     if user is not None:
         user_id = user['userID']
-        db = get_db()
-        filter_it = request.args.get('filter')
-        if filter_it == "" or filter_it is None:
-            cur = db.execute('SELECT * FROM posts '
-                             'JOIN users ON users.userID = posts.posterID '
-                             'WHERE posterID = ? '
-                             'GROUP BY posts.postID ORDER BY postID DESC', [user_id])
-        else:
-            cur = db.execute('SELECT * FROM posts '
-                             'JOIN users ON users.userID = posts.posterID '
-                             'WHERE category LIKE ? AND posterID = ? '
-                             'GROUP BY posts.postID ORDER BY postID DESC', [filter_it, user_id])
-            flash("Filtered Unpopular Opinions based on Desired Category")
-        post = cur.fetchall()
-        cat = db.execute('SELECT DISTINCT category FROM posts WHERE posterID = ? ORDER BY category ASC', [user_id])
-        categories = cat.fetchall()
-        ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        return user_post_view(user_id)
 
-        num_comments, num_likes = count_values(db)
-
-        return render_template('user_profile.html', post=post, categories=categories, id=user_id,
-                               user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
     else:
         flash('Your must be logged in to view your user page!')
         return redirect(url_for('login'))
@@ -404,28 +384,7 @@ def user_posts():
 def profile():
     # Displays all post written by the selected user
     user_id = request.args['userID']
-    filter_it = request.args.get('filter')
-    db = get_db()
-    if filter_it == "" or filter_it is None:
-        cur = db.execute('SELECT * FROM posts '
-                         'JOIN users ON users.userID = posts.posterID '
-                         'WHERE posterID = ? '
-                         'GROUP BY posts.postID ORDER BY postID DESC', [user_id])
-    else:
-        cur = db.execute('SELECT * FROM posts '
-                         'JOIN users ON users.userID = posts.posterID '
-                         'WHERE category LIKE ? AND posterID = ? '
-                         'GROUP BY posts.postID ORDER BY postID DESC', [filter_it, user_id])
-        flash("Filtered Unpopular Opinions based on Desired Category")
-    post = cur.fetchall()
-    curr = db.execute('SELECT DISTINCT category FROM posts WHERE posterID = ? ORDER BY category ASC', [user_id])
-    categories = curr.fetchall()
-    ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-    num_comments, num_likes = count_values(db)
-
-    return render_template('user_profile.html', post=post, categories=categories,
-                           id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
+    return user_post_view(user_id)
 
 
 @app.route('/rank')
@@ -645,3 +604,28 @@ def count_values(db):
         if num_likes[i] is None:
             num_likes[i] = 0
     return num_comments, num_likes
+
+
+def user_post_view(user_id):
+    filter_it = request.args.get('filter')
+    db = get_db()
+    if filter_it == "" or filter_it is None:
+        cur = db.execute('SELECT * FROM posts '
+                         'JOIN users ON users.userID = posts.posterID '
+                         'WHERE posterID = ? '
+                         'GROUP BY posts.postID ORDER BY postID DESC', [user_id])
+    else:
+        cur = db.execute('SELECT * FROM posts '
+                         'JOIN users ON users.userID = posts.posterID '
+                         'WHERE category LIKE ? AND posterID = ? '
+                         'GROUP BY posts.postID ORDER BY postID DESC', [filter_it, user_id])
+        flash("Filtered Unpopular Opinions based on Desired Category")
+    post = cur.fetchall()
+    curr = db.execute('SELECT DISTINCT category FROM posts WHERE posterID = ? ORDER BY category ASC', [user_id])
+    categories = curr.fetchall()
+    ranks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    num_comments, num_likes = count_values(db)
+
+    return render_template('user_profile.html', post=post, categories=categories,
+                           id=user_id, user=load_user(), ranks=ranks, num_comments=num_comments, num_likes=num_likes)
